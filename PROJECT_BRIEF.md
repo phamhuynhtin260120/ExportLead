@@ -352,6 +352,50 @@ ExportLead/
 
 Co the lam monorepo bang pnpm workspace de tach web app, worker va shared package.
 
+## 11.1 Monorepo va chien luoc deploy
+
+ExportLead nen duoc to chuc theo dang **monorepo**, nhung khi deploy van tach rieng tung service. Monorepo chi co nghia la code nam chung trong mot repository de de quan ly, chia se type, schema database va helper chung. No khong co nghia la frontend, backend va worker phai deploy chung mot cuc.
+
+Mo hinh deploy de xuat:
+
+```text
+ExportLead/
+  apps/
+    web/      -> deploy rieng cho dashboard/frontend
+    api/      -> deploy rieng cho backend API
+    worker/   -> deploy rieng cho crawler worker chay nen
+  packages/
+    database/ -> dung chung schema, migration, Prisma client
+    shared/   -> dung chung types, constants, utils
+```
+
+Khi len production:
+
+- `apps/web` chay nhu dashboard cho nguoi dung.
+- `apps/api` chay nhu backend server, quan ly database, source, crawl runs, leads va export.
+- `apps/worker` chay nen, nhan job tu queue va thuc hien crawl.
+- PostgreSQL chay nhu database rieng.
+- Redis chay rieng de phuc vu BullMQ queue va scheduler.
+
+Nhung diem can chu y khi deploy:
+
+- Hosting phai cho chon dung thu muc build/deploy, vi du `apps/web`, `apps/api`, `apps/worker`.
+- Moi app can bien moi truong rieng, vi du `DATABASE_URL`, `REDIS_URL`, auth secret, email provider key.
+- Worker khong nen chay tren moi truong serverless ngan han nhu Vercel function, vi crawler co the chay lau va can Playwright.
+- Worker nen chay tren VPS, Railway, Render, Fly.io hoac mot container service co ho tro background process.
+- Neu dung Playwright, moi truong deploy worker phai cai du browser dependencies.
+- Can script build rieng cho tung app.
+
+Vi du script:
+
+```bash
+pnpm --filter web build
+pnpm --filter api build
+pnpm --filter worker build
+```
+
+Ket luan: monorepo phu hop cho ExportLead vi giup phat trien nhanh, chia se code tot va van deploy tach rieng duoc khi san pham lon hon.
+
 ## 12. Database schema ban dau
 
 ### 12.1 users
