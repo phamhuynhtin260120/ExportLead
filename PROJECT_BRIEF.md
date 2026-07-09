@@ -645,3 +645,100 @@ Y nghia:
 - "Lead" dai dien cho du lieu khach hang tiem nang cho sales logistics.
 
 Ten nay ro rang, de hieu va dung trong tam san pham.
+
+## 19. Nhat ky da thao luan va da thuc hien
+
+### 19.1 Nhung noi dung da thong nhat ve san pham
+
+- Du an se ten la **ExportLead**.
+- ExportLead la cong cu rieng cho nganh van chuyen hang hoa ra nuoc ngoai, khong phai crawler tong quat.
+- Muc tieu giai doan dau la tu dong crawl lead cong ty co kha nang can dich vu logistics quoc te.
+- He thong can ho tro 2 cach crawl:
+  - Tu dong crawl moi sang theo cac source da luu.
+  - Nguoi dung nhap URL thu cong va bam chay crawl ngay.
+- Du lieu crawl ve can duoc luu thanh bang, loc trung va xuat Excel/CSV.
+- He thong can uu tien cong ty co dau hieu xuat khau, san xuat, OEM/ODM, thi truong nuoc ngoai, email/phone cong khai.
+- Lead can duoc cham diem theo muc do phu hop voi sales logistics: Hot, Potential/Warm, Low Fit.
+- Sau giai doan crawl on dinh, du an se mo rong sang email marketing/gioi thieu dich vu.
+- Email marketing nen bat dau theo huong semi-auto: he thong soan email, nguoi dung duyet truoc khi gui.
+
+### 19.2 Nhung noi dung da thong nhat ve cong nghe
+
+- Du an nen lam theo dang **monorepo** de de quan ly code.
+- Trong monorepo van tach ro 3 khoi:
+  - `apps/web`: frontend/dashboard.
+  - `apps/api`: backend API.
+  - `apps/worker`: crawler worker chay nen.
+- Deploy sau nay van tach rieng tung service, monorepo khong bat buoc deploy chung mot cuc.
+- Worker crawl nen chay tren moi truong ho tro background process nhu VPS, Railway, Render, Fly.io hoac container service.
+- Worker khong nen phu thuoc vao serverless ngan han neu dung Playwright va job crawl lau.
+- PostgreSQL duoc de xuat lam database chinh.
+- Redis + BullMQ duoc de xuat cho queue va scheduler.
+- Playwright + Cheerio duoc de xuat cho crawler.
+- ExcelJS/CSV writer duoc de xuat cho tinh nang export file.
+
+### 19.3 Cau truc thu muc da tao
+
+Da tao skeleton monorepo tai:
+
+```text
+D:\WordSpace\Projects\ExportLead
+```
+
+Cau truc chinh:
+
+```text
+ExportLead/
+  apps/
+    web/
+      app/
+      components/
+      lib/
+      styles/
+    api/
+      src/
+        routes/
+        services/
+        lib/
+    worker/
+      src/
+        crawlers/
+        extractors/
+        analyzers/
+        queues/
+        jobs/
+  packages/
+    database/
+      prisma/
+      migrations/
+    shared/
+      types/
+      constants/
+      utils/
+  docs/
+  scripts/
+  PROJECT_BRIEF.md
+```
+
+### 19.4 File da tao
+
+- Da tao file tai `D:\WordSpace\Projects\ExportLead\PROJECT_BRIEF.md`.
+- File nay dung de ghi lai tong quan san pham, cong nghe, cau truc du an, database schema, crawler layers, roadmap va cac quyet dinh da thao luan.
+- Da them file `.gitkeep` vao cac folder de Git co the giu lai cac thu muc rong khi commit.
+
+### 19.5 Ghi chu ve `.gitkeep`
+
+Ban dau co y dinh them file `.git` vao moi folder, nhung da doi sang `.gitkeep` vi `.git` la ten dac biet cua Git. Dung `.gitkeep` la cach an toan va thong dung de giu folder rong trong repository.
+
+### 19.6 Buoc tiep theo de xuat
+
+Thu tu nen lam tiep:
+
+1. Khoi tao monorepo bang `pnpm workspace`.
+2. Tao project Next.js trong `apps/web`.
+3. Tao backend API trong `apps/api`.
+4. Tao worker TypeScript trong `apps/worker`.
+5. Tao Prisma schema trong `packages/database`.
+6. Tao shared types/constants trong `packages/shared`.
+7. Ket noi database va tao cac bang dau tien: sources, crawl_runs, leads.
+8. Lam flow MVP: them URL source -> run crawl -> luu lead -> hien bang lead -> export CSV/Excel.
